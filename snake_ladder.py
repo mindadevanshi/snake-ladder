@@ -220,9 +220,10 @@ def move_player(dice_value,curr_player):
 # function = roll_dice()
 # task = computes dice_value
 #         finds the current player and store it in curr_player
-#         checks if the position of the current player is 0 and there is no luck with six then the player is changed
-#             and if it is six then the player moves to position 1 and then changed
-#         if the player is at some other position then six, then the player moves to the location and then changed
+#         checks if the dice value is 6, then it checks if the position of the current player is 0, then the player moves to position 1
+#         if not at 0 then, then move the token accordingly
+#         if no luck with 6 and the player is at 0 position then pass else move the player accordingly 
+#         at end changing the player to the next one
 # variables = dice _value(int): random value of dice between 1-6 
 #             curr_player(dict): current player
 
@@ -230,19 +231,23 @@ def roll_dice():
     dice_value = random.randint(1,6)
     print(dice_value)
     curr_player = find_player()
-    
 
-    if(curr_player["pos"] == 0):
-        if(dice_value != 6):
-            curr_player = change_player(curr_player)
-        else:
+
+    if(dice_value == 6):
+        if(curr_player["pos"] == 0):
             curr_player["pos"] = 1
-            curr_player = change_player(curr_player)
-
-    else:
-        curr_player = move_player(dice_value,curr_player)
-        curr_player = change_player(curr_player)
+        else:
+            curr_player = move_player(dice_value,curr_player)
+        roll_dice()
     
+    else:
+        if(curr_player["pos"] == 0):
+            pass
+        else:
+            curr_player = move_player(dice_value,curr_player)
+        
+    curr_player = change_player(curr_player)
+
 
 # main function
 if __name__=="__main__":
