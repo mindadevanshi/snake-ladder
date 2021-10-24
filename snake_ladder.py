@@ -1,11 +1,4 @@
 import random
-# Player's list:
-#     Includes players as dictionary with following atttributes
-#     Attributes = 
-#         name = name of player
-#         pos = position of the player
-#         isActive = shows the status which player is playing
-#         winner = shows which player has reached 100
 
 players = [
     {
@@ -34,16 +27,6 @@ players = [
     }
 ]
 
-# Board's list:
-#     Includes 100 dictionary for each position of the board
-#     Attributes = 
-#         pos = gives the block number
-#         snake = shows if there is snake at that position
-#             if not found -> "NULL"
-#             if found -> gives the redirected position of the token
-#         ladder = shows if there is ladder at that position
-#             if not found -> "NULL"
-#             if found -> gives the redirected position of the token
 
 board = [
     {"pos": 0, "snake": "Null", "ladder": "Null"},
@@ -148,26 +131,11 @@ board = [
     {"pos": 99, "snake": "Null", "ladder": "Null"}
 ]
 
-# function = find_player()
-# task = finds the player which is active and not the winner
-# return = player(dict): current active player
-# variables = player(dict): object to iterate the player list
 
 def find_player():
     for player in players:
         if(player["isActive"] == True and player["winner"] == False):
             return player
-
-# function = change_player()
-# argument list = curr_player(dict): current player 
-# task = changes the player acc to the following conditions
-#         set the current player's is active status as false
-#         finds the current player's index and increases it
-#         if the index reaches at last position, iterating it to the first
-#         setting the is active attribute of the next player as true
-#         if the next player is winner then recursively calling the function to find the player which is not winner
-# return = player(dict): current active player
-# variables = player_index(int): index of the current player 
 
 def change_player(curr_player):
     curr_player["isActive"] = False
@@ -186,70 +154,54 @@ def change_player(curr_player):
     
     return player
 
-# function = move_player()
-# argument list = dice_value(int): value of dice
-#                 curr_player(dict): current player 
-# task = computing new position of the current player
-#         if the new position > 100, then changing the player
-#         if new position = 100, then setting the winner attribute of the player as True
-#         if there is snake at new position, then changing the new position at snakes's tail
-#         if there is ladder at new position, then changing the new position at ladder's tail
-#         setting current position of the current player as new position
-# return = curr_player(dict): current active player
-# variables = new_position(int): counts the new position of the current player by adding its position to the dice value
 
 def move_player(dice_value,curr_player):
     new_position = curr_player["pos"] + dice_value
+    intermediate_position = [new_position]
     if(new_position > 100):
         return change_player(curr_player)
     
     elif(new_position == 100):
         curr_player["winner"] = True
         
-
     elif(board[new_position]["snake"] != "Null"):
         new_position = board[new_position]["snake"]
-
+        intermediate_position.append(new_position)
+        
     elif(board[new_position]["ladder"] != "Null"):
         new_position = board[new_position]["ladder"]
+        intermediate_position.append(new_position)
         
     curr_player["pos"] = new_position
 
-    return curr_player
+    return curr_player,intermediate_position
     
-# function = roll_dice()
-# task = computes dice_value
-#         finds the current player and store it in curr_player
-#         checks if the dice value is 6, then it checks if the position of the current player is 0, then the player moves to position 1
-#         if not at 0 then, then move the token accordingly
-#         if no luck with 6 and the player is at 0 position then pass else move the player accordingly 
-#         at end changing the player to the next one
-# variables = dice _value(int): random value of dice between 1-6 
-#             curr_player(dict): current player
 
 def roll_dice():
     dice_value = random.randint(1,6)
     print(dice_value)
     curr_player = find_player()
-
+    
+    intermediate = []
 
     if(dice_value == 6):
         if(curr_player["pos"] == 0):
             curr_player["pos"] = 1
         else:
-            curr_player = move_player(dice_value,curr_player)
+            curr_player,intermediate = move_player(dice_value,curr_player)
         roll_dice()
     
     else:
         if(curr_player["pos"] == 0):
             pass
         else:
-            curr_player = move_player(dice_value,curr_player)
+            curr_player,intermediate = move_player(dice_value,curr_player)
         
     curr_player = change_player(curr_player)
+    
+    return intermediate
 
 
-# main function
 if __name__=="__main__":
     for player in players:
         if player["winner"] is False:
